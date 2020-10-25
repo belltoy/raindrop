@@ -20,7 +20,7 @@ struct Args {
     #[structopt(short, long, help = "Execute or not")]
     execute: bool,
 
-    #[structopt(short, long, help = "MySQL URL", required_if("execute", "true"))]
+    #[structopt(short, long, help = "MySQL URL, example: `mysql://user:password@host:port/db_name`", required_if("execute", "true"))]
     mysql: Option<String>,
 }
 
@@ -70,6 +70,7 @@ fn main() -> Result<(), String> {
         });
     });
 
+    // Need execution
     if args.execute {
         execute_sqls(args.mysql.as_ref().unwrap(), &input_files, &outputs)?;
     }
@@ -77,7 +78,7 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
-/// Read sql statements from input files
+/// Read sql statements from input files which's path was given in the parameter
 fn read_files(inputs: &Vec<String>) -> Result<Vec<(PathBuf, Vec<String>)>, String> {
     let inputs_paths = inputs.iter().flat_map(|p| {
         let mut result = glob(p).unwrap().peekable();
@@ -92,6 +93,8 @@ fn read_files(inputs: &Vec<String>) -> Result<Vec<(PathBuf, Vec<String>)>, Strin
     .flat_map(|p| {
         p.map_err(|e| format!("glob pattern error: {}", e))
          .and_then(|p| {
+             // If path is dir, we read files in that dir
+             // Only support one level currently.
              if p.is_dir() {
                  p.read_dir().map_err(|e| format!("read_dir error: {}", e))
                  .map(|op: std::fs::ReadDir| {
@@ -131,20 +134,20 @@ fn read_files(inputs: &Vec<String>) -> Result<Vec<(PathBuf, Vec<String>)>, Strin
         return Err(format!("{:?}", errors));
     }
 
-    let inputs = inputs.into_iter().map(|p| p.unwrap());
+    let inputs = inputs.into_iter().map(Result::unwrap);
 
-    let (inputs_contents, io_errors): (Vec<Result<_, _>>, _) = inputs.map(|input_file| -> Result<_, String> {
+    let (inputs_contents, io_errors): (Vec<_>, _) = inputs.map(|input_file| -> Result<_, String> {
         debug!("Open file: {:?}", input_file);
         let f = std::fs::File::open(&input_file).map_err(|e| {
             format!("open file {} error: {}", input_file.to_str().unwrap_or("unknown path"), e)
         })?;
 
         let reader = std::io::BufReader::new(f);
-        let lines = reader.lines().map(|line| {
+        let lines: Vec<_> = reader.lines().map(|line| {
             // turn std::io::Error to String error
             let line = line.map_err(|e| format!("IO Error when reading lines: {}", e));
             line
-        }).collect::<Vec<_>>();
+        }).collect();
         Ok((input_file, lines))
     }).partition(Result::is_ok);
 
