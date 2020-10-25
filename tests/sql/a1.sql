@@ -1,0 +1,2 @@
+UPDATE X SET a = 5 WHERE id = 1;
+UPDATE X SET a = 6 WHERE id = 2;
