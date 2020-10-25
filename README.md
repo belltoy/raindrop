@@ -13,6 +13,12 @@ TODOs:
 ### Build & Run
 
 ```sh
+# Build
+cargo build
+
+# Run unit tests
+cargo test
+
 # Show helps
 cargo run -- -h
 
