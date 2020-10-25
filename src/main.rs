@@ -159,14 +159,19 @@ fn read_files(inputs: &Vec<String>) -> Result<Vec<(PathBuf, Vec<String>)>, Strin
         return Err(e.into());
     }
 
-    let inputs = inputs_contents.map(|(file_name, p)| {
-        let p = p.into_iter()
-         .map(|line_result| {
-             // TODO handle read line error
-             line_result.unwrap()
-         })
-         .collect::<Vec<_>>();
-        (file_name, p)
+    let inputs = inputs_contents.map(|(file_name, lines_result)| {
+        let lines: Vec<_> = lines_result.into_iter()
+
+            // TODO handle read line error
+            .map(Result::unwrap)
+
+            // filter out empty lines
+            .map(|line| line.trim().to_owned())
+            .filter(|line| line.len() > 0)
+
+            .collect();
+
+        (file_name, lines)
     }).collect::<Vec<_>>();
 
     Ok(inputs)
