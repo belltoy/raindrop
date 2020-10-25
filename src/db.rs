@@ -8,6 +8,8 @@ pub fn init_clients(url: &str, size: usize) -> MySQLResult<Pool> {
     Ok(pool)
 }
 
+/// Here not use async client, because this tool will simulate multiple clients and execute sql
+/// statements in its' own order in the original file. Async execution will break the order.
 pub fn execute_sqls(clients: &mut[(PooledConn, String)], sqls: &[Vec<(&usize, &str)>]) -> MySQLResult<()> {
     let cases_count = sqls.iter().enumerate().map(|(i, case)| {
         info!("Executing case: {}", i);

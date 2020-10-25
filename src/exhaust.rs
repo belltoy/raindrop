@@ -1,5 +1,9 @@
+//! Implementation of shuffle multiple slices in its own order
+//!
+//! This algorithm use backtracking, but loop will be better.
 
-pub fn fill<T: Copy + std::fmt::Debug>(inputs: &[&[T]]) -> Vec<Vec<T>> {
+/// Combine all slices in its own order, return all possible cases.
+pub fn shuffle<T: Copy + std::fmt::Debug>(inputs: &[&[T]]) -> Vec<Vec<T>> {
     let mut results: Vec<Vec<T>> = Vec::new();
     let mut result: Vec<T> = Vec::new();
 
@@ -110,7 +114,7 @@ mod tests {
         ];
 
         for (input, mut check) in cases {
-            let mut results = super::fill(&input);
+            let mut results = super::shuffle(&input);
             let slice = results.as_mut_slice();
             slice.sort();
 

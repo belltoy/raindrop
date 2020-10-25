@@ -59,8 +59,8 @@ fn main() -> Result<(), String> {
 
     // ref
     let input_contents: Vec<_> = (&input_contents[..]).iter().map(|p| &p[..]).collect();
-    // exhaust all cases
-    let outputs = exhaust::fill(&input_contents[..]);
+    // shuffle and exhaust all possible cases
+    let outputs = exhaust::shuffle(&input_contents[..]);
 
     outputs.iter().enumerate().for_each(|(i, case)| {
         debug!("-- Case: {}", i);
