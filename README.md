@@ -97,3 +97,7 @@ client2：update X set a=8 where id=8;
 2. [x] 良好的代码设计，可读性，可维护性，可扩展性。
 3. [x] 以上可以在单机实现，用 VM 或者 Docker 启动 TiDB 集群不限
 
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
